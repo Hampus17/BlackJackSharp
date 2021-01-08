@@ -2,7 +2,7 @@
 
 public class Card {
     public int cardValue { get; }
-    public int blackJackValue { get; }
+    public int blackJackValue { get; set; }
     public SuitType suit { get; }
 
     public Card(int value, SuitType Suit) {

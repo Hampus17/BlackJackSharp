@@ -16,7 +16,7 @@ public class Game {
 
     public Game() {
         dealer = new Player { isDealer = true };
-        player = new Player { balance = 5000 };
+        player = new Player { isDealer = false, balance = 5000 };
         gameState = GameStatus.InMenu;
     }
 
@@ -48,20 +48,6 @@ public class Game {
 
                 // Print the game stuff
                 StartGame();
-
-                // Check who won and log it
-                Console.WriteLine("\n########################################\n");
-                if (gameState == GameStatus.PlayerWin) {
-                    Console.WriteLine("[Game] Player won!");
-                } else if (gameState == GameStatus.HouseWin) {
-                    Console.WriteLine("[Game] House won!");
-                }
-                else if (gameState == GameStatus.GameDraw) {
-                    Console.WriteLine("[Game] Draw!");
-                }
-                else {
-                    gameState = GameStatus.InMenu;
-                }
 
                 PrintStats();
                 Thread.Sleep(4000);
@@ -208,46 +194,75 @@ public class Game {
         dealer.DrawCard(gameDeck);
         Console.WriteLine("[Dealer] Drew hidden card");
 
-        Thread.Sleep(1000);
+        Thread.Sleep(2000);
         player.DrawCard(gameDeck);
-        Console.WriteLine("[Player] Drew {0}", player.hand[0].ToString());
+        Console.WriteLine("[Player] Drew {0}", player.lastDrawnCard.ToString());
 
         Thread.Sleep(2000);
         dealer.DrawCard(gameDeck);
-        Console.WriteLine("[Dealer] Drew {0}", dealer.hand[1].ToString());
+        Console.WriteLine("[Dealer] Drew {0}", dealer.lastDrawnCard.ToString());
 
         Thread.Sleep(1500);
         player.DrawCard(gameDeck);
-        Console.WriteLine("[Player] Drew {0}", player.hand[1].ToString());
-
-        Thread.Sleep(1000);
-        Console.WriteLine("\n[Game] The Dealer's hand consist of: " +
-            "\n - Hidden" +
-            "\n - {0}", dealer.hand[1].ToString());
-
-        player.ToString();
+        Console.WriteLine("[Player] Drew {0}\n", player.lastDrawnCard.ToString());
 
         bool playerStay = false;
 
         // Loop for player choices (exits when players wants to stay)
         while (gameState == GameStatus.InGame && !playerStay) {
 
+            Thread.Sleep(2000);
+            if (dealer.bestValue < 16) {
+                Console.WriteLine("\n[Game] Dealer score is under 16, must draw another card");
+                dealer.DrawCard(gameDeck);
+                Thread.Sleep(2000);
+                Console.WriteLine("[Dealer] Drew {0}", dealer.lastDrawnCard.ToString());
+            } else if (dealer.bestValue >= 17) {
+                Console.WriteLine("\n[Game] Dealer score is over 16, must stay");
+                Thread.Sleep(2000);
+                Console.WriteLine("[Dealer] Stay");
+            }
+
+            Thread.Sleep(2000);
+            Console.WriteLine("[Game] The Dealer's hand consist of: " +
+                "\n - Hidden" +
+                "\n - {0}", dealer.hand[1].ToString());
+
+            Thread.Sleep(2000);
+            Console.WriteLine(player.ToString());
+
             // Before getting the input whether the player wants to draw or stay, check if loss
+            Thread.Sleep(2000);
             if (player.bestValue == 21) {
                 PlayerWin();
                 break;
-            }
-            else if (dealer.bestValue == 21) {
+            } else if (dealer.bestValue == 21) {
                 HouseWin();
                 break;
-            } else if (player.bestValue > 21) {
+            } else if ((dealer.bestValue >= 17 && dealer.bestValue <= 19) && (player.bestValue >= 17 && player.bestValue <= 19)) { 
+                HouseWin();
+                break;
+            } else if (dealer.bestValue == 20 && player.bestValue == 20) {
+                gameState = GameStatus.GameDraw;
+                break;
+            }  else if (player.bestValue > 21) {
                 HouseWin();
                 break;
             } else if (dealer.bestValue > 21) {
                 PlayerWin();
                 break;
-            }
+            } else if (player.bestValue <= 21 && dealer.bestValue <= 21) {
+                if (player.bestValue == dealer.bestValue)
+                    gameState = GameStatus.GameDraw;
+            } else if (player.bestValue > 21 && dealer.bestValue <= 21)
+                HouseWin();
+            else if (dealer.bestValue > 21 && player.bestValue <= 21)
+                PlayerWin();
+            else if (player.bestValue > 21 && dealer.bestValue > 21)
+                gameState = GameStatus.GameDraw;
 
+
+            // Take input
             Console.WriteLine("\n[Game] Do you want to draw (D) or stay (S)?");
             Console.Write(">>> ");
             string playerChoice = Console.ReadLine();
@@ -265,50 +280,48 @@ public class Game {
             
 
             if (playerChoice.Equals("s", StringComparison.OrdinalIgnoreCase)) {
-                Console.WriteLine("[Player] Stay ");
-
-                Thread.Sleep(1000);
-                Console.WriteLine("\n[Game] The Player's hand consist of: ");
-                player.ToString();
-
-                Console.WriteLine("\n[Game] Revealing the Dealer's cards ");
-                Thread.Sleep(1000);
-                dealer.ToString();
-
+                Console.WriteLine("[Player] Stay \n");
                 break;
             }
 
             if (playerChoice.Equals("d", StringComparison.OrdinalIgnoreCase)) {
                 player.DrawCard(gameDeck);
-                Console.WriteLine("[Player] Drew {0}", player.hand[player.hand.Count - 1].ToString());
+                Console.WriteLine("[Player] Drew {0}", player.lastDrawnCard.ToString());
 
-                Thread.Sleep(1000);
-                player.ToString();
+                Thread.Sleep(2000);
+                Console.WriteLine(player.ToString());
 
                 Console.WriteLine("\n[Game] The Dealer's hand consist of: " +
                     "\n - Hidden" +
-                    "\n - {0}", dealer.hand[1].ToString());
+                    "\n - {0}\n", dealer.hand[1].ToString());
             }
         }
 
         // Simple checks to determine if dealer or player won (or draw)
-        if (player.bestValue <= 21 && dealer.bestValue <= 21) {
-            if (player.bestValue == dealer.bestValue)
-                gameState = GameStatus.GameDraw;
-            else if (player.bestValue > dealer.bestValue)
-                PlayerWin();
-            else if (player.bestValue < dealer.bestValue)
-                HouseWin();
-        }
-        else if (player.bestValue > 21 && dealer.bestValue <= 21)
-            HouseWin();
-        else if (dealer.bestValue > 21 && player.bestValue <= 21)
-            PlayerWin();
-        else if (player.bestValue > 21 && dealer.bestValue > 21)
-            gameState = GameStatus.GameDraw;
+
 
         Thread.Sleep(2000);
+        if (gameState == GameStatus.PlayerWin) {
+            Console.WriteLine("\n\n[Game] Player won!");
+        }
+        else if (gameState == GameStatus.HouseWin) {
+            Console.WriteLine("\n\n[Game] House won!");
+        }
+        else if (gameState == GameStatus.GameDraw) {
+            Console.WriteLine("\n\n[Game] Draw!");
+        }
 
+        Console.WriteLine("[Info] Final Score\n");
+
+        Thread.Sleep(2000);
+        Console.WriteLine(player.ToString());
+
+        Thread.Sleep(2000);
+        Console.WriteLine(dealer.ToString());
+
+        Thread.Sleep(2000);
+        Console.WriteLine("\n[Info] Press any button to continue...");
+        Console.ReadLine();
     }
 
     private void PrintMenu() {
@@ -376,3 +389,6 @@ public class Game {
         }
     }
 }
+
+
+
