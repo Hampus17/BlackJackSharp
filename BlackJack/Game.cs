@@ -204,7 +204,7 @@ public class Game {
 
         Thread.Sleep(1500);
         player.DrawCard(gameDeck);
-        Console.WriteLine("[Player] Drew {0}\n", player.lastDrawnCard.ToString());
+        Console.WriteLine("[Player] Drew {0}", player.lastDrawnCard.ToString());
 
         bool playerStay = false;
 
@@ -224,7 +224,7 @@ public class Game {
             }
 
             Thread.Sleep(2000);
-            Console.WriteLine("[Game] The Dealer's hand consist of: " +
+            Console.WriteLine("\n[Game] The Dealer's hand consist of: " +
                 "\n - Hidden" +
                 "\n - {0}", dealer.hand[1].ToString());
 
