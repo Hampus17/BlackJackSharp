@@ -36,7 +36,6 @@ public class Player {
 
             if (aceIsPresent) {
                 lowValue = tempHand.Sum(card => card.blackJackValue);
-                Console.WriteLine("[Log] {0}", lowValue);
 
                 for (int i = 0; i < hand.Count; i++) 
                     for (int j = 0; j < indexOfAces.Count; j++)

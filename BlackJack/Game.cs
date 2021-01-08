@@ -224,9 +224,9 @@ public class Game {
             }
 
             Thread.Sleep(2000);
-            Console.WriteLine("\n[Game] The Dealer's hand consist of: " +
-                "\n - Hidden" +
-                "\n - {0}", dealer.hand[1].ToString());
+            Console.WriteLine("\n[Game] The Dealer's hand consist of: " + "\n- Hidden");
+            for (int i = 1; i < dealer.hand.Count; i++)
+                Console.WriteLine("- {0}", dealer.hand[i].ToString());
 
             Thread.Sleep(2000);
             Console.WriteLine(player.ToString());
@@ -291,14 +291,14 @@ public class Game {
                 Thread.Sleep(2000);
                 Console.WriteLine(player.ToString());
 
-                Console.WriteLine("\n[Game] The Dealer's hand consist of: " +
-                    "\n - Hidden" +
-                    "\n - {0}\n", dealer.hand[1].ToString());
+                Console.WriteLine("\n[Game] The Dealer's hand consist of: " + "\n- Hidden");
+                for (int i = 1; i < dealer.hand.Count; i++)
+                    Console.WriteLine("- {0}", dealer.hand[i].ToString());
+                    
             }
         }
 
         // Simple checks to determine if dealer or player won (or draw)
-
 
         Thread.Sleep(2000);
         if (gameState == GameStatus.PlayerWin) {
@@ -311,7 +311,7 @@ public class Game {
             Console.WriteLine("\n\n[Game] Draw!");
         }
 
-        Console.WriteLine("[Info] Final Score\n");
+        Console.WriteLine("\n\n[Info] Final Score");
 
         Thread.Sleep(2000);
         Console.WriteLine(player.ToString());
